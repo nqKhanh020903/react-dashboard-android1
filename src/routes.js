@@ -4,6 +4,8 @@ import TableList from "views/Tables.js";
 import UserPage from "views/User.js";
 import Login from "views/Login";
 import Post from "views/Post";
+import Category from "views/Category";
+import ListUser from "views/ListUser";
 
 var routes = [
   {
@@ -32,6 +34,20 @@ var routes = [
     name: "Quản lý bài thuốc",
     icon: "nc-icon nc-tile-56",
     component: <Post />,
+    layout: "/admin",
+  },
+  {
+    path: "/category",
+    name: "Quản lý danh mục",
+    icon: "nc-icon nc-tile-56",
+    component: <Category />,
+    layout: "/admin",
+  },
+  {
+    path: "/list-users",
+    name: "Quản lý người dùng",
+    icon: "nc-icon nc-tile-56",
+    component: <ListUser />,
     layout: "/admin",
   },
   {

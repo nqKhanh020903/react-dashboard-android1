@@ -53,18 +53,15 @@ function Post() {
 
     // Nếu có ID bài viết (đang sửa), lấy dữ liệu bài viết đó
     if (postId) {
-        const fetchPost = async () => {
-          const postRef = ref(database, `Post/${postId - 1}`); // Dùng Id bài viết trong Firebase (bắt đầu từ 0)
-          const snapshot = await get(postRef);
-          if (snapshot.exists()) {
-            const post = snapshot.val();
-            setPostData(post);
-            // Cập nhật lựa chọn cây thuốc
-            const selectedOptions = post.CayThuocId.map(id => ({ value: id, label: cayThuocList.find(item => item.value === id)?.label }));
-            setSelectedCayThuoc(selectedOptions);
-          }
-        };
-        fetchPost();
+      const fetchPost = async () => {
+        const postRef = ref(database, `Post/${postId - 1}`);
+        const snapshot = await get(postRef);
+        if (snapshot.exists()) {
+          const post = snapshot.val();
+          setPostData(post);
+        }
+      };
+      fetchPost();
     }
   }, [postId]);
 
@@ -76,16 +73,25 @@ function Post() {
     }));
   };
 
-  const handleSelectChange = (selectedOptions) => {
-    setSelectedCayThuoc(selectedOptions);
-    // Lưu lại ID của cây thuốc đã chọn vào mảng CayThuocId
-    const selectedIds = selectedOptions.map(option => option.value);
+  const handleSelectChange = (selected, name) => { 
     setPostData((prevData) => ({
       ...prevData,
-      CayThuocId: selectedIds,
+      [name]: selected.map(item => item.value),
     }));
   };
-
+  
+  const resetForm = () => {
+    setPostData({
+      TieuDe: "",
+      TomTatNoiDung: "",
+      TacGia: "",
+      ThamVanYKhoa: "",
+      CayThuocId: [],
+      Image: "",
+      NgayDang: "",
+      Nguon: "",
+    });
+  };  
 
   const handleSaveToFirebase = async () => {
     try {
@@ -102,6 +108,8 @@ function Post() {
             }
           });
         }
+
+      
       
       if (postId) {
         // Cập nhật bài viết nếu có postId
@@ -120,6 +128,7 @@ function Post() {
         const postRefToUpdate = ref(database, `Post/${postData.Id - 1}`);
         await set(postRefToUpdate, updatedPost);
         alert("Bài viết đã được cập nhật!");
+        resetForm();
         navigate("/admin/posts");
       } else {
         // Thêm bài viết mới nếu không có postId
@@ -139,6 +148,7 @@ function Post() {
         const newPostRef = ref(database, `Post/${newId - 1}`);
         await set(newPostRef, newPost);
         alert("Bài viết đã được đăng!");
+        resetForm();
         navigate("/admin/posts");
       }
     } catch (error) {
@@ -268,11 +278,13 @@ function Post() {
                   <FormGroup>
                     <Label for="CayThuocId">Cây thuốc liên quan</Label>
                     <Select
-                      isMulti
-                      options={cayThuocList}
-                      value={selectedCayThuoc}
-                      onChange={handleSelectChange}
+                        isMulti
+                        name="CayThuocId"
+                        value={cayThuocList.filter(option => Array.isArray(postData.CayThuocId) && postData.CayThuocId.includes(option.value))}
+                        options={cayThuocList}
+                        onChange={(selected) => handleSelectChange(selected, 'CayThuocId')}
                     />
+
                   </FormGroup>
                 </Col>
               </Row>

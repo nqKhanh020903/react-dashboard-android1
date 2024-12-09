@@ -254,27 +254,37 @@ function Tables() {
                         <th>Cách dùng & Liều lượng</th>
                         <th style={{width: '150px'}}>Loại bộ phận dùng</th>
                         <th>Trị bệnh</th>
+                        <th style={{width: '150px'}}>Phân bố</th>
+                        <th style={{width: '150px'}}>Mô tả cây</th>
                         <th style={{width: '120px'}}>Tùy chọn</th>
                       </tr>
                     </thead>
                     <tbody>
                     {cayThuocs.map((thuoc, index) => {
-                      const danhMucName = thuoc.DanhMucId
-                      .map((danhmucid) => danhMucs.find((item) => item.Id === danhmucid)?.TenBoPhanDung || 'Không xác định')
-                      .join(', ');
-                      const hashtagNames = thuoc.HashTagId
-                        .map((hashtagId) => hashtags.find((item) => item.Id === hashtagId)?.TenHashTag || 'Không xác định')
-                        .join(', ');
+                      const danhMucName = Array.isArray(thuoc.DanhMucId) 
+                      ? thuoc.DanhMucId
+                          .map((danhmucid) => danhMucs.find((item) => item.Id === danhmucid)?.TenBoPhanDung || 'Không xác định')
+                          .join(', ') 
+                      : 'Không có thông tin';
+                    
+                    const hashtagNames = Array.isArray(thuoc.HashTagId)
+                      ? thuoc.HashTagId
+                          .map((hashtagId) => hashtags.find((item) => item.Id === hashtagId)?.TenHashTag || 'Không xác định')
+                          .join(', ') 
+                      : 'Không có thông tin';
+                    
 
                       return (
                         <tr key={index}>
                           <td>{thuoc.TenThuoc}</td>
                           <td>{thuoc.Ho}</td>
-                          <td>{thuoc.BoPhanDung.join(', ')}</td>
+                          <td>{Array.isArray(thuoc.BoPhanDung) ? thuoc.BoPhanDung.join(', ') : 'Không có thông tin'}</td>
                           <td>{thuoc.CongDung}</td>
                           <td>{thuoc.CachDungVaLieuLuong}</td>
-                          <td>{danhMucName}</td> {/* Hiển thị tên Danh Mục */}
-                          <td>{hashtagNames}</td> {/* Hiển thị tên Hashtag */}
+                          <td>{danhMucName}</td>
+                          <td>{hashtagNames}</td>
+                          <td>{thuoc.PhanBo}</td>
+                          <td>{thuoc.MoTaCay}</td>
                           <td>
                             <button
                               style={{

@@ -11,6 +11,7 @@ function Herb() {
   const [danhMucOptions, setDanhMucOptions] = useState([]);
   const [hashTagOptions, setHashTagOptions] = useState([]);
   const [plantData, setPlantData] = useState({
+    Id: 0,
     TenThuoc: '',
     TenKhoaHoc: '',
     CongDung: '',
@@ -21,6 +22,8 @@ function Herb() {
     Ho: '',
     DanhMucId: [],
     HashTagId: [],
+    PhanBo: '',
+    MoTaCay: '',
   });
 
   const plantId = parseInt(new URLSearchParams(window.location.search).get('id'), 10); // Chuyển thành số
@@ -68,6 +71,8 @@ function Herb() {
             Ho: plant.Ho || '',
             DanhMucId: plant.DanhMucId || [],
             HashTagId: plant.HashTagId || [],
+            PhanBo: plant.PhanBo || '',
+            MoTaCay: plant.MoTaCay || '',
           });
         } else {
           alert("Không tìm thấy cây thuốc.");
@@ -113,13 +118,14 @@ function Herb() {
       const newId = maxId + 1;
       
       const images = plantData.Image.split(',').map((image, index) => ({
-        Id: index + 1, // Tạo ID tự động
+        Id: index + 1,
         ImagePath: image
       }));
       if (plantId) {
         // Nếu có ID, cập nhật cây thuốc
         const plantRef = ref(database, `CayThuoc/${plantId - 1}`);
         await set(plantRef, {
+          Id : plantId,
           TenThuoc: plantData.TenThuoc,
           TenKhoaHoc: plantData.TenKhoaHoc,
           CongDung: plantData.CongDung,
@@ -130,6 +136,8 @@ function Herb() {
           Ho: plantData.Ho,
           DanhMucId: plantData.DanhMucId,
           HashTagId: plantData.HashTagId,
+          PhanBo: plantData.PhanBo,
+          MoTaCay: plantData.MoTaCay,
         });
         alert("Cập nhật thông tin cây thuốc thành công!");
       } else {
@@ -147,6 +155,8 @@ function Herb() {
           Ho: plantData.Ho,
           DanhMucId: plantData.DanhMucId,
           HashTagId: plantData.HashTagId,
+          PhanBo: plantData.PhanBo,
+          MoTaCay: plantData.MoTaCay,
         });
         alert("Thêm thông tin cây thuốc thành công!");
       }
@@ -163,6 +173,8 @@ function Herb() {
         Ho: '',
         DanhMucId: [],
         HashTagId: [],
+        PhanBo: '',
+        MoTaCay: '',
       });
   
       // Điều hướng về trang trước đó
@@ -262,10 +274,32 @@ function Herb() {
                       </FormGroup>
                     </Col>
                   </Row>
-
-                  {/* Row 3 - 2 Inputs */}
                   <Row>
-                    <Col md="6">
+                  <Col md="3">
+                      <FormGroup>
+                        <Label for="notes">Phân bố</Label>
+                        <Input
+                          type="text"
+                          id="PhanBo"
+                          name="PhanBo"
+                          value={plantData.PhanBo}
+                          onChange={handleInputChange}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col md="3">
+                      <FormGroup>
+                        <Label for="notes">Mô tả cây</Label>
+                        <Input
+                          type="text"
+                          id="MoTaCay"
+                          name="MoTaCay"
+                          value={plantData.MoTaCay}
+                          onChange={handleInputChange}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col md="3">
                       <FormGroup>
                         <Label for="notes">Công dụng</Label>
                         <Input
@@ -277,7 +311,7 @@ function Herb() {
                         />
                       </FormGroup>
                     </Col>
-                    <Col md="6">
+                    <Col md="3">
                       <FormGroup>
                         <Label for="image">Hình ảnh</Label>
                        
