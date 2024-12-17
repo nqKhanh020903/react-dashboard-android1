@@ -10,10 +10,11 @@ import {
 }
 from 'mdb-react-ui-kit';
 import { useNavigate } from 'react-router-dom';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { ref, get } from 'firebase/database';
+import { getAuth, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, fetchSignInMethodsForEmail } from 'firebase/auth';
+import { ref, get, set } from 'firebase/database';
 
 import { database } from '../firebase/firebase';
+import { Button } from 'reactstrap';
 
 function Login() {
   const navigate = useNavigate();
@@ -21,13 +22,60 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    // Xử lý đăng xuất, ví dụ như xóa sessionStorage, localStorage, token, v.v.
-    // localStorage.removeItem("userToken"); 
 
-    // Sau khi logout, điều hướng về trang đăng nhập
-    navigate("/login");  // Hoặc chuyển hướng về trang home, v.v.
-  }, [navigate]);
+  //#region dang nhap = google
+  const handleGoogleSignIn = async () => {
+    try {
+      const auth = getAuth();
+      const provider = new GoogleAuthProvider();
+      provider.addScope('email')
+      const result = await signInWithPopup(auth, provider);
+  
+      const user = result.user;
+     
+      const userRef = ref(database, `Users/${user.uid}`);
+      const snapshot = await get(userRef);
+
+      const email = user.reloadUserInfo?.providerUserInfo?.[0]?.email;
+  
+      if (!snapshot.exists()) {
+        await set(userRef, {
+          email: email,
+          full_name: user.displayName,
+          id_role: "1",
+          image_user: user.photoURL,
+          is_active: true,
+          phoneNumber: "",
+          username: user.displayName.replace(/\s+/g, '').toLowerCase()
+        });
+      }
+  
+      navigate('/admin/dashboard');
+    } catch (error) {
+      console.error("Lỗi đăng nhập bằng Google:", error);
+      setError('Đăng nhập Google không thành công!');
+    }
+  };
+
+
+  //#region dang xuat
+  const handleLogout = async () => {
+    const auth = getAuth();
+    try {
+      await signOut(auth);
+
+      localStorage.removeItem('userToken'); 
+      sessionStorage.removeItem('userSession');
+
+      navigate('/login'); 
+    } catch (error) {
+      console.error('Lỗi khi đăng xuất:', error);
+    }
+  };
+
+  useEffect(() => {
+    handleLogout();
+  }, []);
 
   const handleLogin = async () => {
     try {
@@ -96,7 +144,7 @@ function Login() {
             <a href="!#">Forgot password?</a>
           </div>
 
-          <MDBBtn className="mb-4 w-100" size="lg" onClick={handleLogin}>Sign in</MDBBtn>
+          <Button className="mb-4 w-100" size="lg" onClick={handleLogin} style={{backgroundColor: 'aqua'}}>Sign in</Button>
 
           <div className="divider d-flex align-items-center my-4">
             <p className="text-center fw-bold mx-3 mb-0">OR</p>
@@ -107,9 +155,9 @@ function Login() {
             Continue with facebook
           </MDBBtn>
 
-          <MDBBtn className="mb-4 w-100" size="lg" style={{backgroundColor: '#55acee'}}>
-            <MDBIcon fab icon="twitter" className="mx-2"/>
-            Continue with twitter
+          <MDBBtn className="mb-4 w-100" size="lg" style={{backgroundColor: '#DB4437'}}  onClick={handleGoogleSignIn}>
+            <MDBIcon fab icon="google" className="mx-2"/>
+            Continue with google
           </MDBBtn>
 
         </MDBCol>

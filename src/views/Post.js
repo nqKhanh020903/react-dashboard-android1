@@ -108,8 +108,6 @@ function Post() {
             }
           });
         }
-
-      
       
       if (postId) {
         // Cập nhật bài viết nếu có postId
@@ -121,7 +119,7 @@ function Post() {
           Nguon: postData.Nguon,
           TacGia: postData.TacGia,
           ThamVanYKhoa: postData.ThamVanYKhoa,
-          CayThuocId: postData.CayThuocId,
+          CayThuocId: postData.CayThuocId || [],
           Image: postData.Image
         };
   

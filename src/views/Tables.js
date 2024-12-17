@@ -119,6 +119,13 @@ function Tables() {
       }
     }
   };
+
+  const convertDateToISO = (dateString) => {
+    if (!dateString) return null; // Kiểm tra nếu giá trị rỗng
+    const [day, month, year] = dateString.split('/');
+    return `${year}-${month}-${day}`; // Chuyển sang YYYY-MM-DD
+  };
+  
   
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value);
@@ -132,7 +139,7 @@ function Tables() {
     // Lọc bài viết dựa trên ngày bắt đầu và ngày kết thúc
     const filtered = posts.filter(post => {
       if (!startDate && !endDate) return true; // Nếu không có tìm kiếm ngày, trả về tất cả bài viết
-      const postDate = post.NgayDang;
+      const postDate = convertDateToISO(post.NgayDang);
       if (startDate && endDate) {
         return postDate >= startDate && postDate <= endDate; // Lọc theo khoảng ngày
       }
